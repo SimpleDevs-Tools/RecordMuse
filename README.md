@@ -51,6 +51,37 @@ _**NOTE**: You do not need to run this while you are recording. In fact, you're 
 
 ---
 
+### Validating: `validate.py`
+
+```bash
+python src/validate.py <path/to/directory> [-tc <timestamp/column/name>] [-p]
+```
+
+This script checks all files present in a given directory and does the following:
+
+1. Produces plots of the raw data, and saves them in a new `plots/` directory.
+2. Calculates consecutive duplicates and records them.
+
+This is needed if you wish to confirm whether the samples you are getting are actually following the listed sample rates according to Muse documentation. This is especially important for streaming apps like _Mind Monitor_ where it's been identified that timestamps are not really accurate.
+
+![duplicates.png](./docs/duplicates.png)
+
+_**NOTE**: This will only search the IMMEDIATE directory you provide, so nested subdirectories will not have their csv files detected. If there are any specific files you want to IGNORE instead, there is a global config variable inside `src//validate.py` you can modify for your own purposes.
+
+
+---
+
+### Conver from Mind Monitor to BlueMuse: `convert.py`
+
+```bash
+python src/convert.py <path/to/muse/csv>
+```
+
+Mind Monitor may give you a single `.csv` file that contains all the raw EEG data, accelerometer data, gyroscope data, and ppg data. If you want to convert this into a format more befitting this toolkit's expected format (i.e. the BlueMuse data formats, where each stream its its own `.csv` file), then you can use this script.
+
+
+---
+
 ### Power Spectral Density: `src/psd.py`
 
 ```bash
