@@ -1,0 +1,8 @@
+numpy
+pandas
+pylsl
+pyqtgraph
+PyQt6
+scipy
+matplotlib
+plotly
