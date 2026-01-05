@@ -62,6 +62,8 @@ This script calculates the PSD and bandpowers of a given EEG csv file. It's reco
 ![Power Spectral Density](./docs/psd.png)
 ![Bandpowers](./docs/bandpowers.png)
 
+_**NOTE**: This script will REMOVE YOUR ORIGINAL TIMESTAMPS and replace it with a relative `time` column. So if you have any time-based analysis, make sure to properly crop your EEG data time-wise prior to running this operations!_
+
 ## Installation
 
 ### Step 1: Set up an LSL stream
@@ -95,7 +97,8 @@ source .venv/bin/activate   # Mac / Linux
 # Installing dependencies via pip
 pip install -r requirements.txt
 
-# Commands (covered in next section)
+# Commands (covered above)
+# ...
 
 # Closing the virtual environment
 deactivate
