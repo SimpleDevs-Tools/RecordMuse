@@ -103,3 +103,14 @@ pip install -r requirements.txt
 # Closing the virtual environment
 deactivate
 ```
+
+### Step 3: Record
+
+This is a two-step process:
+
+1. Start streaming from whichever streaming application you've decided on.
+2. Start recording via `src/record.py`
+3. Do whatever task or operation you want while recording
+4. After ceasing recording, run `src/filter.py` to perform a basic 60Hz notch filter, as well as 1-40Hz bandpass if you so choose.
+5. Perform whatever operations needed to slice the EEG, Accelerometer, Gyroscope, and PPG data time-wise (i.e. align your data prior).
+6. use `src/psd.py` to calculate the power spectral density (PSD) and time-series Bandpowers of your filtered, sliced EEG data.
