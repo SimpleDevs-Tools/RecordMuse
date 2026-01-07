@@ -51,6 +51,25 @@ _**NOTE**: You do not need to run this while you are recording. In fact, you're 
 
 ---
 
+### Normalizing: `normalize.py`
+
+```bash
+python src/normalize.py <path/to/rest/eeg> <path/to/query/eeg> [-tc <timestamp column>] [-sb <start/buffer/time>] [-eb <end/buffer/time>] [-v]
+```
+
+This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER CHANNEL - which thus maintains cross-channel relationships while standardizing all data to an even analysis playing field. Naturally, this script requires 2 arguments: a path to your rest-state EEG data, and a path to your query EEG data. Several optional parameters are provided. You can dictate:
+
+1. `-tc`: Which column is the timestamp column, 
+2. `-sb` and `-eb`: The start and end buffer amounts 
+    - e.g. `-sb 5` means you want to remove the first 5 time units from your rest-state EEG
+    - e.g. `-eb 5` means you remove the last 5 time units from your rest-state EEG
+3. `-v`: We offer a post-normalization validation check where your raw query EEG and its normalized variant are compared in 3 different ways: 
+    1. _Mean and Standard Deviation_: Each channel in the normalized data should be normalized to a mean of 0 and a standard deviation of 1.
+    2. _Distribution Shape_: The distributions of each channel are compared between their raw and normalized variants; distribution histograms should look the same.
+    3. _Frequency Distribution Check_: We perform a simple welch PSD calculation on both the raw and normalized data; though their powers should be at a different scale, their shapes should remain the same.
+
+---
+
 ### Validating: `validate.py`
 
 ```bash
