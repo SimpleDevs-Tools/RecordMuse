@@ -96,14 +96,16 @@ def normalize(rest_src:str, exp_src:str, ts_col:str='lsl_unix_ts', start_buffer=
         nor_s = histogram_sparkline(norm_vals, bins=30, range=hist_range)
         print(f"{ch:>6} | raw  {histogram_sparkline(raw_vals, bins=30)} | norm {histogram_sparkline(norm_vals, bins=30)}")
 
-    print("\n-- Check 3: Frequency-Domain Validation")
-    fs = 250  # adjust if known
-    f, p_rest = welch(rest_mid[ch], fs=fs)
-    _, p_exp  = welch(exp_norm[ch], fs=fs)
+    print("\n-- Check 3: Frequency-Domain Validation (AF7)")
+    fs = 256  # adjust if known
+    x_rest = rest_mid['AF7'].to_numpy()
+    x_exp  = exp_norm['AF7'].to_numpy()
+    f, p_rest = welch(x_rest, fs=fs)
+    _, p_exp  = welch(x_exp, fs=fs)
     plt.semilogy(f, p_rest, label="Rest")
     plt.semilogy(f, p_exp, label="Experiment (norm)")
     plt.legend()
-    plt.title(f"PSD: {ch}")
+    plt.title(f"PSD: AF7")
     plt.show()
 
 if __name__ == "__main__":

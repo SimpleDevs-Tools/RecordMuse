@@ -139,10 +139,12 @@ _This assumes that you are using **BlueMuse** for your LSL stream setup._
 All dependencies are provided in `requirements.txt`. It's safest to set up a virtual Python environment first. This has been tested in Python `3.11`.
 
 ```bash
-# Virtual environment `.venv` setup
+# Virtual environment `.venv` setup (Windows)
 py -m venv .venv
-.venv/Scripts/activate      # Windows
-source .venv/bin/activate   # Mac / Linux
+.venv/Scripts/activate
+# Virtual environment `.venv` setup (Mac / Linux)
+python -m venv .venv
+source .venv/bin/activate
 
 # Installing dependencies via pip
 pip install -r requirements.txt
@@ -152,6 +154,31 @@ pip install -r requirements.txt
 
 # Closing the virtual environment
 deactivate
+```
+
+#### WARNING: Execution Policy and Permissions
+
+If you attempt to activate your virtual environment and you get the error below, then you need to double-check that you have execution policy permissions allowed.
+
+Firstly, double-check the output of this command. You are likely to see the following:
+
+```bash
+Get-ExecutionPolicy -List
+
+# Expected Output
+Scope ExecutionPolicy
+----- ---------------
+MachinePolicy       Undefined
+   UserPolicy       Undefined
+      Process       Undefined
+  CurrentUser       Undefined   # <-- This should be "RemoteSigned"
+ LocalMachine    RemoteSigned
+```
+
+To change this, run the following command:
+
+```bash
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 ### Step 3: Record
