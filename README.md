@@ -7,10 +7,11 @@ A collection of Python packages for reading EEG, Accelerometer, Gyroscope, and P
 
 ## Functions
 
-### Demo-ing: `demo.py`
+<details>
+<summary><h3>Demo-ing: <code>demo.py</code></h3></summary>
 
 ```bash
-python src/demo.py
+python demo.py
 ```
 
 This script allows you to visualize the data streams _without recording data_ - hence, it's purely a demo operation. For recording, check out the next function: `record.py`.
@@ -19,12 +20,15 @@ This script allows you to visualize the data streams _without recording data_ - 
 
 _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. I recommend running this script only AFTER your LSL stream is already on._
 
+</details>
+
 ---
 
-### Recording: `record.py`
+<details>
+<summary><h3>Recording: <code>record.py</code></h3></summary>
 
 ```bash
-python src/record.py [-d <OUTPUT_DIR>]
+python record.py [-d <OUTPUT_DIR>]
 ```
 
 This script records the EEG, Accelerometer, Gyroscope, and PPG data simultaneously and outputs the streams as CSV files. It's multi-threaded (meaning that stream sampling and file saving are separate threads). It also provides visualizations of the current streams, similar to `demo.py`.
@@ -33,12 +37,15 @@ _**NOTE**: This script auto-generates an output directory, but if you want you c
 
 _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. I recommend running this script only AFTER your LSL stream is already on._
 
+</details>
+
 ---
 
-### Filtering: `filter.py`
+<details>
+<summary><h3>Filtering: <code>filter.py</code></h3></summary>
 
 ```bash
-python src/filter.py <path/to/eeg.csv> [-b]
+python filter.py <path/to/eeg.csv> [-b]
 ```
 
 This script looks at the EEG file generated from `src/record.py` and applies a 60Hz notch filter. This 60Hz notch filter is needed to counteract impedence caused by electrical components in the Muse device. This script can also apply a bandpass filter from 1-40Hz as a way to offset incredibly high Gamma frequencies. This can be toggled by adding a `-b` flag to your command.
@@ -49,12 +56,15 @@ To validate whether the operation was successful, a plot is generated and saved 
 
 _**NOTE**: You do not need to run this while you are recording. In fact, you're expected to run this immediately after recording your Muse data._
 
+</details>
+
 ---
 
-### Normalizing: `normalize.py`
+<details>
+<summary></h3>Normalizing: <code>normalize.py</code></h3></summary>
 
 ```bash
-python src/normalize.py <path/to/rest/eeg> <path/to/query/eeg> [-tc <timestamp column>] [-sb <start/buffer/time>] [-eb <end/buffer/time>] [-v]
+python normalize.py <path/to/rest/eeg> <path/to/query/eeg> [-tc <timestamp column>] [-sb <start/buffer/time>] [-eb <end/buffer/time>] [-v]
 ```
 
 This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER CHANNEL - which thus maintains cross-channel relationships while standardizing all data to an even analysis playing field. Naturally, this script requires 2 arguments: a path to your rest-state EEG data, and a path to your query EEG data. Several optional parameters are provided. You can dictate:
@@ -68,12 +78,15 @@ This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER C
     2. _Distribution Shape_: The distributions of each channel are compared between their raw and normalized variants; distribution histograms should look the same.
     3. _Frequency Distribution Check_: We perform a simple welch PSD calculation on both the raw and normalized data; though their powers should be at a different scale, their shapes should remain the same.
 
+</details>
+
 ---
 
-### Validating: `validate.py`
+<details>
+<summary><h3>Validating: <code>validate.py</code></h3></summary>
 
 ```bash
-python src/validate.py <path/to/directory> [-tc <timestamp/column/name>] [-p]
+python validate.py <path/to/directory> [-tc <timestamp/column/name>] [-p]
 ```
 
 This script checks all files present in a given directory and does the following:
@@ -87,24 +100,28 @@ This is needed if you wish to confirm whether the samples you are getting are ac
 
 _**NOTE**: This will only search the IMMEDIATE directory you provide, so nested subdirectories will not have their csv files detected. If there are any specific files you want to IGNORE instead, there is a global config variable inside `src//validate.py` you can modify for your own purposes.
 
+</details>
 
 ---
 
-### Conver from Mind Monitor to BlueMuse: `convert.py`
+<details>
+<summary><h3>Conver from Mind Monitor to BlueMuse: <code>convert.py</code></h3></summary>
 
 ```bash
-python src/convert.py <path/to/muse/csv>
+python convert.py <path/to/muse/csv>
 ```
 
 Mind Monitor may give you a single `.csv` file that contains all the raw EEG data, accelerometer data, gyroscope data, and ppg data. If you want to convert this into a format more befitting this toolkit's expected format (i.e. the BlueMuse data formats, where each stream its its own `.csv` file), then you can use this script.
 
+</details>
 
 ---
 
-### Power Spectral Density: `src/psd.py`
+<details>
+<summary><h3>Power Spectral Density: <code>psd.py</code></h3></summary>
 
 ```bash
-python ./src/psd.py <path/to/eeg.csv>
+python psd.py <path/to/eeg.csv>
 ```
 
 This script calculates the PSD and bandpowers of a given EEG csv file. It's recommended to use EEG data that has at least been filtered by `filter.py`.
@@ -113,6 +130,8 @@ This script calculates the PSD and bandpowers of a given EEG csv file. It's reco
 ![Bandpowers](./docs/bandpowers.png)
 
 _**NOTE**: This script will REMOVE YOUR ORIGINAL TIMESTAMPS and replace it with a relative `time` column. So if you have any time-based analysis, make sure to properly crop your EEG data time-wise prior to running this operations!_
+
+</details>
 
 ## Installation
 
@@ -160,18 +179,19 @@ deactivate
 
 If you attempt to activate your virtual environment and you get the error below, then you need to double-check that you have execution policy permissions allowed.
 
-Firstly, double-check the output of this command. You are likely to see the following:
+Firstly, open up a PowerShell window in Administrator Mode. Then, double-check the output of this command. You are likely to see the following:
 
 ```bash
+# Run this Command
 Get-ExecutionPolicy -List
 
-# Expected Output
+# Likely Output
 Scope ExecutionPolicy
 ----- ---------------
 MachinePolicy       Undefined
    UserPolicy       Undefined
       Process       Undefined
-  CurrentUser       Undefined   # <-- This should be "RemoteSigned"
+  CurrentUser       Undefined   # <-- This should be "RemoteSigned", but it isn't...
  LocalMachine    RemoteSigned
 ```
 
@@ -181,13 +201,15 @@ To change this, run the following command:
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
+You can double-check once more if the permission has been applied to "CurrentUser" - if so, then you're golden.
+
 ### Step 3: Record
 
 This is a two-step process:
 
 1. Start streaming from whichever streaming application you've decided on.
-2. Start recording via `src/record.py`
+2. Start recording via `record.py`
 3. Do whatever task or operation you want while recording
-4. After ceasing recording, run `src/filter.py` to perform a basic 60Hz notch filter, as well as 1-40Hz bandpass if you so choose.
+4. After ceasing recording, run `filter.py` to perform a basic 60Hz notch filter, as well as 1-40Hz bandpass if you so choose.
 5. Perform whatever operations needed to slice the EEG, Accelerometer, Gyroscope, and PPG data time-wise (i.e. align your data prior).
-6. use `src/psd.py` to calculate the power spectral density (PSD) and time-series Bandpowers of your filtered, sliced EEG data.
+6. use `psd.py` to calculate the power spectral density (PSD) and time-series Bandpowers of your filtered, sliced EEG data.
