@@ -7,11 +7,13 @@ A collection of Python packages for reading EEG, Accelerometer, Gyroscope, and P
 
 ## Functions
 
+### Recording Data: `record/`
+
 <details>
-<summary><h3>Demo-ing: <code>demo.py</code></h3></summary>
+<summary><h4>Demo-ing: <code>record/demo.py</code></h4></summary>
 
 ```bash
-python demo.py
+python record/demo.py
 ```
 
 This script allows you to visualize the data streams _without recording data_ - hence, it's purely a demo operation. For recording, check out the next function: `record.py`.
@@ -23,10 +25,10 @@ _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. 
 </details>
 
 <details>
-<summary><h3>Recording: <code>record.py</code></h3></summary>
+<summary><h4>Recording: <code>record/record.py</code></h4></summary>
 
 ```bash
-python record.py [-d <OUTPUT_DIR>]
+python record/record.py [-d <OUTPUT_DIR>]
 ```
 
 This script records the EEG, Accelerometer, Gyroscope, and PPG data simultaneously and outputs the streams as CSV files. It's multi-threaded (meaning that stream sampling and file saving are separate threads). It also provides visualizations of the current streams, similar to `demo.py`.
@@ -37,11 +39,13 @@ _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. 
 
 </details>
 
+### Processing Data: `processing/`
+
 <details>
-<summary><h3>Filtering: <code>filter.py</code></h3></summary>
+<summary><h4>Filtering: <code>processing/filter.py</code></h4></summary>
 
 ```bash
-python filter.py <path/to/eeg.csv> [-b]
+python processing/filter.py <path/to/eeg.csv> [-b]
 ```
 
 This script looks at the EEG file generated from `src/record.py` and applies a 60Hz notch filter. This 60Hz notch filter is needed to counteract impedence caused by electrical components in the Muse device. This script can also apply a bandpass filter from 1-40Hz as a way to offset incredibly high Gamma frequencies. This can be toggled by adding a `-b` flag to your command.
@@ -55,10 +59,10 @@ _**NOTE**: You do not need to run this while you are recording. In fact, you're 
 </details>
 
 <details>
-<summary><h3>Normalizing: <code>normalize.py</code></h3></summary>
+<summary><h4>Normalizing: <code>processing/normalize.py</code></h4></summary>
 
 ```bash
-python normalize.py <path/to/rest/eeg> <path/to/query/eeg> [-tc <timestamp column>] [-sb <start/buffer/time>] [-eb <end/buffer/time>] [-v]
+python processing/normalize.py <path/to/rest/eeg> <path/to/query/eeg> [-tc <timestamp column>] [-sb <start/buffer/time>] [-eb <end/buffer/time>] [-v]
 ```
 
 This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER CHANNEL - which thus maintains cross-channel relationships while standardizing all data to an even analysis playing field. Naturally, this script requires 2 arguments: a path to your rest-state EEG data, and a path to your query EEG data. Several optional parameters are provided. You can dictate:
@@ -75,10 +79,23 @@ This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER C
 </details>
 
 <details>
-<summary><h3>Validating: <code>validate.py</code></h3></summary>
+<summary><h4>Conver from Mind Monitor to BlueMuse: <code>processing/convert.py</code></h4></summary>
 
 ```bash
-python validate.py <path/to/directory> [-tc <timestamp/column/name>] [-p]
+python processing/convert.py <path/to/muse/csv>
+```
+
+Mind Monitor may give you a single `.csv` file that contains all the raw EEG data, accelerometer data, gyroscope data, and ppg data. If you want to convert this into a format more befitting this toolkit's expected format (i.e. the BlueMuse data formats, where each stream its its own `.csv` file), then you can use this script.
+
+</details>
+
+### Analyzing Data: `analysis/`
+
+<details>
+<summary><h4>Validating: <code>analysis/validate.py</code></h4></summary>
+
+```bash
+python analysis/validate.py <path/to/directory> [-tc <timestamp/column/name>] [-p]
 ```
 
 This script checks all files present in a given directory and does the following:
@@ -90,26 +107,15 @@ This is needed if you wish to confirm whether the samples you are getting are ac
 
 ![duplicates.png](./docs/duplicates.png)
 
-_**NOTE**: This will only search the IMMEDIATE directory you provide, so nested subdirectories will not have their csv files detected. If there are any specific files you want to IGNORE instead, there is a global config variable inside `src//validate.py` you can modify for your own purposes.
+_**NOTE**: This will only search the IMMEDIATE directory you provide, so nested subdirectories will not have their csv files detected. If there are any specific files you want to IGNORE instead, there is a global config variable inside `src//validate.py` you can modify for your own purposes._
 
 </details>
 
 <details>
-<summary><h3>Conver from Mind Monitor to BlueMuse: <code>convert.py</code></h3></summary>
+<summary><h4>Power Spectral Density: <code>analysis/psd.py</code></h4></summary>
 
 ```bash
-python convert.py <path/to/muse/csv>
-```
-
-Mind Monitor may give you a single `.csv` file that contains all the raw EEG data, accelerometer data, gyroscope data, and ppg data. If you want to convert this into a format more befitting this toolkit's expected format (i.e. the BlueMuse data formats, where each stream its its own `.csv` file), then you can use this script.
-
-</details>
-
-<details>
-<summary><h3>Power Spectral Density: <code>psd.py</code></h3></summary>
-
-```bash
-python psd.py <path/to/eeg.csv>
+python analysis/psd.py <path/to/eeg.csv>
 ```
 
 This script calculates the PSD and bandpowers of a given EEG csv file. It's recommended to use EEG data that has at least been filtered by `filter.py`.
@@ -120,6 +126,20 @@ This script calculates the PSD and bandpowers of a given EEG csv file. It's reco
 _**NOTE**: This script will REMOVE YOUR ORIGINAL TIMESTAMPS and replace it with a relative `time` column. So if you have any time-based analysis, make sure to properly crop your EEG data time-wise prior to running this operations!_
 
 </details>
+
+### General Recommended Pipeline
+
+1. Record your Data
+    1. Demo your EEG data streams to ensure proper alignment with the user's scalp (`record/demo.py`)
+    2. Record your EEG data (`record/record.py`)
+2. Processing your Data
+    1.. If needed, convert your EEG data to fit BlueMuse's format (`processing/convert.py`)
+    2. Perform a notch filter of 60Hz to remove noise from electrical components (`processing/filter.py`)
+    3. If you recorded rest-state EEG, normalize your EEG samples (`processing/normalize.py`)
+3. Analyze your Data
+    1. Perform a Power Spectral Density calculation to identify key frequencies in your data (`analysis/psd.py`)
+    2. Validate your samples (`analysis/validate.py`)
+
 
 ## Installation
 
