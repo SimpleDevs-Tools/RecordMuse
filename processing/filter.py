@@ -120,6 +120,9 @@ def filter_eeg(eeg_csv_path, apply_bandpass:bool=False):
     plt.savefig(eeg_csv_path.with_name(eeg_csv_path.stem + "_filtered.png"), bbox_inches='tight')
     plt.show()
 
+    # Return the outpath
+    return out_path
+
 
 # ===================== ENTRY POINT =====================
 

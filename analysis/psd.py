@@ -276,7 +276,9 @@ def calculate_psd(src):
     )
 
     # Save bandpowers as a csv file
-    bandpowers.to_csv(os.path.join(csv_output_dir, 'bandpowers.csv'), index=False)
+    csv_outpath = os.path.join(csv_output_dir, 'bandpowers.csv')
+    bandpowers.to_csv(csv_outpath, index=False)
+    return csv_outpath
 
 
 if __name__ == "__main__":

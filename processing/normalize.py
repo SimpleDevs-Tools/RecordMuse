@@ -74,7 +74,7 @@ def normalize(rest_src:str, exp_src:str, ts_col:str='lsl_unix_ts', start_buffer=
     print(f"Used {len(rest_mid)} rest samples for baseline.")
 
     # Validate
-    if not validate: return
+    if not validate: return outpath
     print("\n=== VALIDATION ===")
 
     print("-- Check 1: Mean and SD")
@@ -107,6 +107,9 @@ def normalize(rest_src:str, exp_src:str, ts_col:str='lsl_unix_ts', start_buffer=
     plt.legend()
     plt.title(f"PSD: AF7")
     plt.show()
+
+    # Return outpath
+    return outpath
 
 if __name__ == "__main__":
 
