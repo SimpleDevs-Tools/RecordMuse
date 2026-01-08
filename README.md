@@ -55,7 +55,7 @@ _**NOTE**: You do not need to run this while you are recording. In fact, you're 
 </details>
 
 <details>
-<summary></h3>Normalizing: <code>normalize.py</code></h3></summary>
+<summary><h3>Normalizing: <code>normalize.py</code></h3></summary>
 
 ```bash
 python normalize.py <path/to/rest/eeg> <path/to/query/eeg> [-tc <timestamp column>] [-sb <start/buffer/time>] [-eb <end/buffer/time>] [-v]
