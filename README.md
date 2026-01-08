@@ -79,7 +79,7 @@ This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER C
 </details>
 
 <details>
-<summary><strong>Conver from Mind Monitor to BlueMuse: <code>processing/convert.py</strong></strong></summary>
+<summary><strong>Conver from Mind Monitor to BlueMuse: <code>processing/convert.py</code></strong></summary>
 
 ```bash
 python processing/convert.py <path/to/muse/csv>
