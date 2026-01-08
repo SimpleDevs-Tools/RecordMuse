@@ -10,7 +10,7 @@ A collection of Python packages for reading EEG, Accelerometer, Gyroscope, and P
 ### Recording Data: `record/`
 
 <details>
-<summary><h4>Demo-ing: <code>record/demo.py</code></h4></summary>
+<summary><strong>Demo-ing: <code>record/demo.py</code></strong></summary>
 
 ```bash
 python record/demo.py
@@ -25,7 +25,7 @@ _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. 
 </details>
 
 <details>
-<summary><h4>Recording: <code>record/record.py</code></h4></summary>
+<summary><strong>Recording: <code>record/record.py</code></strong></summary>
 
 ```bash
 python record/record.py [-d <OUTPUT_DIR>]
@@ -42,7 +42,7 @@ _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. 
 ### Processing Data: `processing/`
 
 <details>
-<summary><h4>Filtering: <code>processing/filter.py</code></h4></summary>
+<summary><strong>Filtering: <code>processing/filter.py</code></strong></summary>
 
 ```bash
 python processing/filter.py <path/to/eeg.csv> [-b]
@@ -59,7 +59,7 @@ _**NOTE**: You do not need to run this while you are recording. In fact, you're 
 </details>
 
 <details>
-<summary><h4>Normalizing: <code>processing/normalize.py</code></h4></summary>
+<summary><strong>Normalizing: <code>processing/normalize.py</code></strong></summary>
 
 ```bash
 python processing/normalize.py <path/to/rest/eeg> <path/to/query/eeg> [-tc <timestamp column>] [-sb <start/buffer/time>] [-eb <end/buffer/time>] [-v]
@@ -79,7 +79,7 @@ This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER C
 </details>
 
 <details>
-<summary><h4>Conver from Mind Monitor to BlueMuse: <code>processing/convert.py</code></h4></summary>
+<summary><strong>Conver from Mind Monitor to BlueMuse: <code>processing/convert.py</strong></h4></summary>
 
 ```bash
 python processing/convert.py <path/to/muse/csv>
@@ -92,7 +92,7 @@ Mind Monitor may give you a single `.csv` file that contains all the raw EEG dat
 ### Analyzing Data: `analysis/`
 
 <details>
-<summary><h4>Validating: <code>analysis/validate.py</code></h4></summary>
+<summary><strong>Validating: <code>analysis/validate.py</code></strong></summary>
 
 ```bash
 python analysis/validate.py <path/to/directory> [-tc <timestamp/column/name>] [-p]
@@ -112,7 +112,7 @@ _**NOTE**: This will only search the IMMEDIATE directory you provide, so nested 
 </details>
 
 <details>
-<summary><h4>Power Spectral Density: <code>analysis/psd.py</code></h4></summary>
+<summary><strong>Power Spectral Density: <code>analysis/psd.py</code></strong></summary>
 
 ```bash
 python analysis/psd.py <path/to/eeg.csv>
@@ -133,7 +133,7 @@ _**NOTE**: This script will REMOVE YOUR ORIGINAL TIMESTAMPS and replace it with 
     1. Demo your EEG data streams to ensure proper alignment with the user's scalp (`record/demo.py`)
     2. Record your EEG data (`record/record.py`)
 2. Processing your Data
-    1.. If needed, convert your EEG data to fit BlueMuse's format (`processing/convert.py`)
+    1. If needed, convert your EEG data to fit BlueMuse's format (`processing/convert.py`)
     2. Perform a notch filter of 60Hz to remove noise from electrical components (`processing/filter.py`)
     3. If you recorded rest-state EEG, normalize your EEG samples (`processing/normalize.py`)
 3. Analyze your Data
