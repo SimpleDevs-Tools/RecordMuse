@@ -59,12 +59,24 @@ def compute_muse_psd(df:pd.DataFrame):
         )
         # Convert to decibels (dB)
         Sxx_dB = 10 * np.log10(Sxx + 1e-12)
-        
+
         # Add our responses to out outputs. We only do this once.
         psd[ch] = Sxx_dB
         if freqs is None:
+            # Add freqs first
             freqs = f
-            times = t
+
+            # Because times `t` is relative to start, we need to map back to original timestamps
+            # Convert spectrogram times (seconds since start)
+            # to sample indices in original dataframe
+            sample_idx = np.round(t * SAMPLE_RATE).astype(int)
+            sample_idx = np.clip(sample_idx, 0, len(df) - 1)
+
+            # Pull original timestamps
+            times = pd.DataFrame({
+                "unix_ms": df.loc[sample_idx, "unix_ms"].values,
+                "lsl_unix_ts": df.loc[sample_idx, "lsl_unix_ts"].values
+            })
     
     # Return the three data extracted from all eeg channels
     return freqs, times, psd
@@ -99,7 +111,7 @@ def plot_muse_psd(
     for row_index in range(len(psds)):
         pre_title = f"{psds[row_index]['pre_title']} " if 'pre_title' in psds[row_index] else ""
         freqs = psds[row_index]['freqs']
-        times = psds[row_index]['times']
+        times = psds[row_index]['times']['lsl_unix_ts'].values
         psd = psds[row_index]['psd']
 
         for col_index, ch in enumerate(CHANNELS):
@@ -157,10 +169,16 @@ def compute_bandpowers_time_series(
             # Logarithm → absolute band power
             band_power_log = np.log10(band_power + 1e-12)
 
-            for t, val in zip(times, band_power_log):
-                records.append((t, ch, band, val))
+            for i, val in enumerate(band_power_log):
+                records.append([
+                    times.iloc[i]["unix_ms"],
+                    times.iloc[i]["lsl_unix_ts"],
+                    ch,
+                    band,
+                    val
+                ])
 
-    bandpowers = pd.DataFrame(records, columns=["time", "channel", "band", "power"])
+    bandpowers = pd.DataFrame(records, columns=["unix_ms", "lsl_unix_ts", "channel", "band", "power"])
     return bandpowers
 
 # ========== PLOT TIME SERIES ==========
@@ -263,7 +281,7 @@ def calculate_psd(src):
     bandpowers_outpath = os.path.join(plot_output_dir,'bandpowers.png')
     plot_time_series(
         bandpowers, 
-        x_col='time', 
+        x_col='lsl_unix_ts', 
         y_col='power', 
         c_col='band', 
         facet_col='channel', 

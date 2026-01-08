@@ -83,7 +83,7 @@ def producer_thread(stream_type):
         if sample is None:
             continue
 
-        unix_ms = int(time.time() * 1000)
+        unix_ms = lsl_ts * 1000
         row = [unix_ms, lsl_ts] + sample
 
         queues[stream_type].put(row)
