@@ -127,6 +127,8 @@ _**NOTE**: This script will REMOVE YOUR ORIGINAL TIMESTAMPS and replace it with 
 
 </details>
 
+---
+
 ### General Recommended Pipeline
 
 1. Record your Data
