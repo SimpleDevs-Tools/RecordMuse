@@ -22,8 +22,6 @@ _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. 
 
 </details>
 
----
-
 <details>
 <summary><h3>Recording: <code>record.py</code></h3></summary>
 
@@ -38,8 +36,6 @@ _**NOTE**: This script auto-generates an output directory, but if you want you c
 _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. I recommend running this script only AFTER your LSL stream is already on._
 
 </details>
-
----
 
 <details>
 <summary><h3>Filtering: <code>filter.py</code></h3></summary>
@@ -57,8 +53,6 @@ To validate whether the operation was successful, a plot is generated and saved 
 _**NOTE**: You do not need to run this while you are recording. In fact, you're expected to run this immediately after recording your Muse data._
 
 </details>
-
----
 
 <details>
 <summary></h3>Normalizing: <code>normalize.py</code></h3></summary>
@@ -80,8 +74,6 @@ This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER C
 
 </details>
 
----
-
 <details>
 <summary><h3>Validating: <code>validate.py</code></h3></summary>
 
@@ -102,8 +94,6 @@ _**NOTE**: This will only search the IMMEDIATE directory you provide, so nested 
 
 </details>
 
----
-
 <details>
 <summary><h3>Conver from Mind Monitor to BlueMuse: <code>convert.py</code></h3></summary>
 
@@ -114,8 +104,6 @@ python convert.py <path/to/muse/csv>
 Mind Monitor may give you a single `.csv` file that contains all the raw EEG data, accelerometer data, gyroscope data, and ppg data. If you want to convert this into a format more befitting this toolkit's expected format (i.e. the BlueMuse data formats, where each stream its its own `.csv` file), then you can use this script.
 
 </details>
-
----
 
 <details>
 <summary><h3>Power Spectral Density: <code>psd.py</code></h3></summary>
