@@ -32,7 +32,7 @@ def interpolate_nans(x):
 
 # ===================== MAIN =====================
 
-def filter_eeg(eeg_csv_path, apply_bandpass:bool=False):
+def filter_eeg(eeg_csv_path, apply_bandpass:bool=False, verbose:bool=True):
 
     # ===================== READING =====================
     
@@ -41,7 +41,7 @@ def filter_eeg(eeg_csv_path, apply_bandpass:bool=False):
     if not eeg_csv_path.exists():
         raise FileNotFoundError(f"File not found: {eeg_csv_path}")
 
-    print(f"Loading EEG file: {eeg_csv_path}")
+    if verbose: print(f"Loading EEG file: {eeg_csv_path}")
     df = pd.read_csv(eeg_csv_path)
     
     # Check channels exist
@@ -52,15 +52,16 @@ def filter_eeg(eeg_csv_path, apply_bandpass:bool=False):
     eeg_data = df[EEG_CHANNELS].values
     for ch in range(eeg_data.shape[1]):
         eeg_data[:, ch] = interpolate_nans(eeg_data[:, ch])
-    print("NaNs in raw EEG:", np.isnan(eeg_data).any())
-    print("NaNs per channel:", np.isnan(eeg_data).sum(axis=0))
+    if verbose:
+        print("NaNs in raw EEG:", np.isnan(eeg_data).any())
+        print("NaNs per channel:", np.isnan(eeg_data).sum(axis=0))
     
     # ===================== FILTER DESIGN =====================
 
-    print("Designing 60 Hz notch filter...")
+    if verbose: print("Designing 60 Hz notch filter...")
     b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_Q, FS)
 
-    print("Designing bandpass filter (1–40 Hz)...")
+    if verbose: print("Designing bandpass filter (1–40 Hz)...")
     # Note: Butterworth filters are maximally flat and produce
     # smooth roll-off instead of a cliff, hard stop.
     b_bp, a_bp = butter(
@@ -72,7 +73,7 @@ def filter_eeg(eeg_csv_path, apply_bandpass:bool=False):
 
     # ===================== APPLY FILTERS =====================
 
-    print("Applying notch filter (zero-phase)...")
+    if verbose: print("Applying notch filter (zero-phase)...")
     filtered = np.zeros_like(eeg_data)
 
     for ch in range(eeg_data.shape[1]):
@@ -100,11 +101,11 @@ def filter_eeg(eeg_csv_path, apply_bandpass:bool=False):
     df_filtered[EEG_CHANNELS] = filtered
     df_filtered.to_csv(out_path, index=False)
 
-    print(f"Filtered EEG saved to: {out_path}")
+    if verbose: print(f"Filtered EEG saved to: {out_path}")
 
     # ===================== OPTIONAL QC PLOT =====================
 
-    print("Plotting PSD (channel TP9) for verification...")
+    if verbose: print("Plotting PSD (channel TP9) for verification...")
     f_raw, pxx_raw = welch(eeg_data[:, 0], FS, nperseg=1024)
     f_filt, pxx_filt = welch(filtered[:, 0], FS, nperseg=1024)
 
@@ -131,5 +132,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Filters 60Hz notch with a provided EEG file outputted from `record.py`.")
     parser.add_argument('filepath', help="Provide the relative filepath to your raw EEG file.", type=str)
     parser.add_argument('-b', '--apply_bandpass', help="Should we apply bandpass filtering?", action="store_true")
+    parser.add_argument('-v', '--verbose', help="Print statements to track how the operation is going?", action="store_true")
     args = parser.parse_args()
-    filter_eeg(args.filepath, args.apply_bandpass)
+    filter_eeg(args.filepath, apply_bandpass=args.apply_bandpass, verbose=args.verbose)
