@@ -49,9 +49,13 @@ def mm_to_bluemuse(target_filepath:str, output_dir:str="converted"):
     # output
     output_dir = os.path.join(os.path.dirname(target_filepath),output_dir)
     os.makedirs(output_dir, exist_ok=True)
-    eeg.to_csv(os.path.join(output_dir, 'EEG.csv'), index=False)
-    accel.to_csv(os.path.join(output_dir, 'Accelerometer.csv'), index=False)
-    gyro.to_csv(os.path.join(output_dir, 'Gyroscope.csv'), index=False)
+    eeg_outpath = os.path.join(output_dir, 'EEG.csv')
+    eeg.to_csv(eeg_outpath, index=False)
+    accel_outpath = os.path.join(output_dir, 'Accelerometer.csv')
+    accel.to_csv(accel_outpath, index=False)
+    gyro_outpath = os.path.join(output_dir, 'Gyroscope.csv')
+    gyro.to_csv(gyro_outpath, index=False)
+    return output_dir, eeg_outpath, accel_outpath, gyro_outpath
 
 # Example Usage
 if __name__ == "__main__":
