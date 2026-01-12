@@ -6,7 +6,9 @@ import datetime
 _MUSE_REMAPPINGS = { 'RAW_TP9':'TP9', 
                 'RAW_TP10':'TP10', 
                 'RAW_AF7':'AF7', 
-                'RAW_AF8':'AF8', 
+                'RAW_AF8':'AF8',
+                'AUX_RIGHT':'Right AUX',
+                'AUX_LEFT':'Left AUX', 
                 'Accelerometer_X':'accel_x', 
                 'Accelerometer_Y':'accel_y', 
                 'Accelerometer_Z':'accel_z', 
@@ -37,7 +39,7 @@ def mm_to_bluemuse(target_filepath:str):
     # Group by timestamp,and then get the last row
     signals = signals.groupby('TimeStamp', as_index=False).last()
     # Identify components
-    eeg = signals[['TimeStamp', 'unix_ms', 'lsl_unix_ts', 'TP9', 'AF7', 'AF8', 'TP10']]
+    eeg = signals[['TimeStamp', 'unix_ms', 'lsl_unix_ts', 'TP9', 'AF7', 'AF8', 'TP10', 'Right AUX']]
     accel = signals[['TimeStamp', 'unix_ms', 'lsl_unix_ts', 'accel_x', 'accel_y', 'accel_z']]
     gyro = signals[['TimeStamp', 'unix_ms', 'lsl_unix_ts', 'gyro_x',  'gyro_y', 'gyro_z']]
     # Rename colnames in accel and gyro dataframes
