@@ -35,7 +35,7 @@ def mm_to_bluemuse(target_filepath:str):
     # Separate signals
     signals = df[df['Elements'].isna()]
     # Group by timestamp,and then get the last row
-    signals = signals.groupby('TimeStamp').last()
+    signals = signals.groupby('TimeStamp', as_index=False).last()
     # Identify components
     eeg = signals[['TimeStamp', 'unix_ms', 'lsl_unix_ts', 'TP9', 'AF7', 'AF8', 'TP10']]
     accel = signals[['TimeStamp', 'unix_ms', 'lsl_unix_ts', 'accel_x', 'accel_y', 'accel_z']]
