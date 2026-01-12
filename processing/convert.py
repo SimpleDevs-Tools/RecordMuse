@@ -27,7 +27,7 @@ def timestamp_to_unix_seconds(x) -> int:      # Helper: converts timestamps to u
     unix_seconds = datetime.datetime.timestamp(date_format)
     return unix_seconds
 
-def mm_to_bluemuse(target_filepath:str):
+def mm_to_bluemuse(target_filepath:str, output_dir:str="converted"):
     
     df = pd.read_csv(target_filepath, dtype={'Elements':str})
     df['unix_ms'] = df['TimeStamp'].apply(timestamp_to_unix_milliseconds)
@@ -47,7 +47,7 @@ def mm_to_bluemuse(target_filepath:str):
     gyro = gyro.rename(columns={'gyro_x':'X','gyro_y':'Y','gyro_z':'Z'})
 
     # output
-    output_dir = os.path.join(os.path.dirname(target_filepath),'converted')
+    output_dir = os.path.join(os.path.dirname(target_filepath),output_dir)
     os.makedirs(output_dir, exist_ok=True)
     eeg.to_csv(os.path.join(output_dir, 'EEG.csv'), index=False)
     accel.to_csv(os.path.join(output_dir, 'Accelerometer.csv'), index=False)
@@ -57,5 +57,6 @@ def mm_to_bluemuse(target_filepath:str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert raw muse data from Mind Monitor into BlueMuse format")
     parser.add_argument('target', help="Relative path to the muse csv file that needs to be converted")
+    parser.add_argument('-od', '--output_dir', help="The name of the output directory, which will be created relative to the same directory as the target file", default="converted")
     args = parser.parse_args()
-    mm_to_bluemuse(args.target)
+    mm_to_bluemuse(args.target, output_dir=args.output_dir)
