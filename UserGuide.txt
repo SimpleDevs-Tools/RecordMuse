@@ -1,0 +1,31 @@
+BlueMuse setup guide
+
+1. Start "BlueMuse" app
+2. Start Muse device
+3. Select Muse device in BlueMuse, verify connection
+4. Click "Start Streaming"
+
+Recording
+
+Via Command Line
+1. Open up a terminal
+2. Navigate to Desktop/CodeProjects/RecordMuse
+
+Via VSCode
+1. Open VSCode
+2. Drag and drop CodeProjects/RecordMuse onto GUI
+
+Begin Recording
+
+1. Activate the environment (.venv/Scripts/activate)
+2. Start recording (python record/record.py)
+	-d dictate a specific output folder (will overwrite existing folders with the same name)
+	-if a demo is desired, run python record/demo.py
+
+Stop Recording
+1. Press CTRL-C to end recording.
+
+Validate Data
+1. Run python analysis/validate.py <eeg output folder>
+2. Check the plots folder created inside of <eeg output folder>
+3. Check that duplicates.png has only one column per color per plot.
