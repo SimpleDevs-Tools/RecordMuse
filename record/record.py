@@ -40,7 +40,7 @@ PLOT_FPS = 20
 
 parser = argparse.ArgumentParser(description="Record LSL streams of Muse devices. You can provide an output directory if needed.")
 parser.add_argument('-d', '--dir', help='[OPTIONAL] Provide an output directory where all files are to be saved.', type=str, default=None)
-parser.add_argument('-rd', '--record_duration', help="If toggled, you can define for how long the recording runs for.", type=float)
+parser.add_argument('-rd', '--record_duration', help="If toggled, you can define for how long the recording runs for, in seconds.", type=float)
 args = parser.parse_args()
 
 # ===================== GLOBALS =====================
