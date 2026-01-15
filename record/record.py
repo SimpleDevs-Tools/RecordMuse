@@ -40,6 +40,7 @@ PLOT_FPS = 20
 
 parser = argparse.ArgumentParser(description="Record LSL streams of Muse devices. You can provide an output directory if needed.")
 parser.add_argument('-d', '--dir', help='[OPTIONAL] Provide an output directory where all files are to be saved.', type=str, default=None)
+parser.add_argument('-rd', '--record_duration', help="If toggled, you can define for how long the recording runs for.", type=float)
 args = parser.parse_args()
 
 # ===================== GLOBALS =====================
@@ -208,6 +209,16 @@ def handle_sigint(sig, frame):
     QtWidgets.QApplication.quit()
 
 
+# ===================== TIMEOUT =====================
+
+def timed_stop(seconds):
+    print(f"Recording will stop automatically after {seconds} seconds.")
+    time.sleep(seconds)
+    print("\nTimer expired — stopping recording...")
+    stop_event.set()
+    QtWidgets.QApplication.quit()
+
+
 # ===================== MAIN =====================
 
 def record():
@@ -232,6 +243,15 @@ def record():
     sig_timer = QtCore.QTimer()
     sig_timer.start(100)
     sig_timer.timeout.connect(lambda: None)
+
+    # Start timer thread if requested
+    if args.time is not None:
+        timer_thread = Thread(
+            target=timed_stop,
+            args=(args.record_duration,),
+            daemon=True
+        )
+        timer_thread.start()
 
     windows = []
 
