@@ -203,21 +203,23 @@ class EEGWindow(QtWidgets.QWidget):
             self.curves[ch].setData(x, data[:, ch])
 
 
+# ===================== CLOSING =====================
+
 def handle_sigint(sig, frame):
     print("\nCtrl+C detected — stopping recording...")
     stop_event.set()
     QtWidgets.QApplication.quit()
-
-
-# ===================== TIMEOUT =====================
 
 def timed_stop(seconds):
     print(f"Recording will stop automatically after {seconds} seconds.")
     time.sleep(seconds)
     print("\nTimer expired — stopping recording...")
     stop_event.set()
-    QtWidgets.QApplication.quit()
 
+def check_shutdown():
+    if stop_event.is_set():
+        print("Qt Shutdown initiated")
+        QtWidgets.QApplication.quit()
 
 # ===================== MAIN =====================
 
@@ -244,8 +246,13 @@ def record():
     sig_timer.start(100)
     sig_timer.timeout.connect(lambda: None)
 
+    # QT-side stop check
+    shutdown_timer = QtCore.QTimer()
+    shutdown_timer.start(100)
+    shutdown_timer.timeout.connect(check_shutdown)
+
     # Start timer thread if requested
-    if args.time is not None:
+    if args.record_duration is not None:
         timer_thread = Thread(
             target=timed_stop,
             args=(args.record_duration,),
