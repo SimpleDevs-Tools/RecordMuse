@@ -41,6 +41,7 @@ PLOT_FPS = 20
 parser = argparse.ArgumentParser(description="Record LSL streams of Muse devices. You can provide an output directory if needed.")
 parser.add_argument('-d', '--dir', help='[OPTIONAL] Provide an output directory where all files are to be saved.', type=str, default=None)
 parser.add_argument('-rd', '--record_duration', help="If toggled, you can define for how long the recording runs for, in seconds.", type=float)
+parser.add_argument('-nv', '--no_visualization', help="Disable live visualization (PyQtGraph windows). This may help with improving performance.", action="store_false")
 args = parser.parse_args()
 
 # ===================== GLOBALS =====================
@@ -60,10 +61,11 @@ queues = {stype: Queue() for stype in STREAM_TYPES}
 viz_buffers = {}
 viz_locks = {}
 
-for stype in STREAM_TYPES:
-    maxlen = VIS_WINDOW_SEC * STREAM_RATES[stype]
-    viz_buffers[stype] = deque(maxlen=maxlen)
-    viz_locks[stype] = Lock()
+if not args.no_visualization:
+    for stype in STREAM_TYPES:
+        maxlen = VIS_WINDOW_SEC * STREAM_RATES[stype]
+        viz_buffers[stype] = deque(maxlen=maxlen)
+        viz_locks[stype] = Lock()
 
 
 # ===================== PRODUCER =====================
@@ -90,8 +92,9 @@ def producer_thread(stream_type):
         queues[stream_type].put(row)
 
         # Non-blocking visualization tap
-        with viz_locks[stream_type]:
-            viz_buffers[stream_type].append(sample)
+        if not args.no_visualization:
+            with viz_locks[stream_type]:
+                viz_buffers[stream_type].append(sample)
 
 
 # ===================== CONSUMER =====================
@@ -236,8 +239,20 @@ def record():
 
     print(f"Recording into folder: {outdir}")
 
-    app = QtWidgets.QApplication([])
+    app = None
+    if not args.no_visualization:
+        app = QtWidgets.QApplication([])
 
+    if not args.no_visualization:
+        signal.signal(signal.SIGINT, handle_sigint)
+
+        sig_timer = QtCore.QTimer()
+        sig_timer.start(100)
+        sig_timer.timeout.connect(lambda: None)
+
+        shutdown_timer = QtCore.QTimer()
+        shutdown_timer.start(100)
+        shutdown_timer.timeout.connect(check_shutdown)
     # --- Enable Ctrl+C handling ---
     signal.signal(signal.SIGINT, handle_sigint)
 
@@ -262,16 +277,22 @@ def record():
 
     windows = []
 
-    windows.append(EEGWindow())
-    windows[-1].show()
+    if not args.no_visualization:
+        windows.append(EEGWindow())
+        windows[-1].show()
 
-    for stype in ['Accelerometer', 'Gyroscope', 'PPG']:
-        w = StreamWindow(stype)
-        w.show()
-        windows.append(w)
+        for stype in ['Accelerometer', 'Gyroscope', 'PPG']:
+            w = StreamWindow(stype)
+            w.show()
+            windows.append(w)
 
     try:
-        app.exec()
+        if not args.no_visualization
+            app.exec()
+        else:
+            # Headless mode: wait until stop_event is set
+            while not stop_event.is_set():
+                time.sleep(0.1)
     finally:
         print("\nStopping all streams...")
         stop_event.set()
