@@ -41,7 +41,7 @@ PLOT_FPS = 20
 parser = argparse.ArgumentParser(description="Record LSL streams of Muse devices. You can provide an output directory if needed.")
 parser.add_argument('-d', '--dir', help='[OPTIONAL] Provide an output directory where all files are to be saved.', type=str, default=None)
 parser.add_argument('-rd', '--record_duration', help="If toggled, you can define for how long the recording runs for, in seconds.", type=float)
-parser.add_argument('-nv', '--no_visualization', help="Disable live visualization (PyQtGraph windows). This may help with improving performance.", action="store_false")
+parser.add_argument('-v', '--visualize', help="Enable live visualization (PyQtGraph windows). Disabling visualizations may help with improving performance.", action="store_true")
 args = parser.parse_args()
 
 # ===================== GLOBALS =====================
@@ -61,7 +61,7 @@ queues = {stype: Queue() for stype in STREAM_TYPES}
 viz_buffers = {}
 viz_locks = {}
 
-if not args.no_visualization:
+if args.visualize:
     for stype in STREAM_TYPES:
         maxlen = VIS_WINDOW_SEC * STREAM_RATES[stype]
         viz_buffers[stype] = deque(maxlen=maxlen)
@@ -92,7 +92,7 @@ def producer_thread(stream_type):
         queues[stream_type].put(row)
 
         # Non-blocking visualization tap
-        if not args.no_visualization:
+        if args.visualize:
             with viz_locks[stream_type]:
                 viz_buffers[stream_type].append(sample)
 
@@ -240,10 +240,10 @@ def record():
     print(f"Recording into folder: {outdir}")
 
     app = None
-    if not args.no_visualization:
+    if args.visualize:
         app = QtWidgets.QApplication([])
 
-    if not args.no_visualization:
+    if args.visualize:
         signal.signal(signal.SIGINT, handle_sigint)
 
         sig_timer = QtCore.QTimer()
@@ -277,7 +277,7 @@ def record():
 
     windows = []
 
-    if not args.no_visualization:
+    if args.visualize:
         windows.append(EEGWindow())
         windows[-1].show()
 
@@ -287,7 +287,7 @@ def record():
             windows.append(w)
 
     try:
-        if not args.no_visualization
+        if args.visualize:
             app.exec()
         else:
             # Headless mode: wait until stop_event is set
