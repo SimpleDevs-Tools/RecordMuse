@@ -49,7 +49,7 @@ args = parser.parse_args()
 stop_event = Event()
 
 base_outdir = args.dir if args.dir is not None else datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-outdir = base_outdir
+outdir = "[recording]-" + base_outdir
 count = 0
 while os.path.exists(outdir):
     count += 1
