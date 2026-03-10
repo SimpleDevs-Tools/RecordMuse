@@ -156,7 +156,7 @@ def mm_to_bluemuse(target_filepath:str, output_dir:str="converted", groupby_choi
 
     # output
     if output_dir is None or len(output_dir) == 0: output_dir = "converted"
-    output_dir = "[recording]-" + output_dir
+    output_dir = "_recording_" + output_dir
     output_dir = os.path.join(os.path.dirname(target_filepath),output_dir)
     os.makedirs(output_dir, exist_ok=True)
     eeg_outpath = os.path.join(output_dir, 'EEG.csv')

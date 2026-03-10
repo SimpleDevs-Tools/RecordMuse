@@ -71,12 +71,12 @@ def plot_raw(filename:str, df:pd.DataFrame, ts_col:str, with_lines:bool=False, o
 
 # ============ MAIN ============
 
-def validate(src_dir:str, ts_col:str, with_lines:bool=False, show:bool=False):
-
+def validate(src_dir:str, ts_col:str='unix_ms', with_lines:bool=False, show:bool=False):
+    
     # Find all CSV files in the directory
     csv_files = glob.glob(os.path.join(src_dir, "*.csv"))
     if not csv_files:
-        print(f"No CSV files found in {src_path}")
+        print(f"No CSV files found in {src_dir}")
         return
 
     # Validating if filename is in the excluded files or not
