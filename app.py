@@ -224,7 +224,24 @@ this tool to check how many have been identified. You can also control under
 which root directory you want to check under, if needed.
 
 Regardless, the current task is to, for each trial with rest EEG and simulation 
-EEG, normalize the data for PSD analysis.
+EEG, normalize the data for PSD analysis. _**You must manually move your group 
+of recordings into a single folder. So for example, if you recorded a resting-state 
+EEG recording and a simulation-state EEG recording for a single person, then you 
+must arrange them similarly to what's visually depicted below. This participant's 
+directory must be stored within a parent directory in of itself.**_
+
+```
+./
+└── samples/
+    ├── participant_id/
+    │   ├── _recording_rest/
+    │   │   ├── EEG.csv
+    │   │   └── ...
+    │   └── _recording_vr/
+    │       ├── EEG.csv
+    │       └── ...
+    └── ...
+```
 """
 
 # --------------------------
@@ -232,7 +249,7 @@ EEG, normalize the data for PSD analysis.
 # --------------------------
 root_dir = st.text_input(
     "Root directory to scan", 
-    value=""
+    value="samples"
 )
 col1, col2 = st.columns(2)
 with col1:
@@ -335,7 +352,7 @@ if len(st.session_state.selected) > 0:
     with col1:
         st.subheader("Filtering Params")
         st.markdown("This operation generates a new `EEG_filtered.csv` for each of the rest and simulation eeg files.")
-        apply_bandpass = st.checkbox("Apply bandpass filtering to smooth EEG signals")
+        apply_bandpass = st.checkbox("Apply bandpass filtering to smooth EEG signals", value=True)
     with col2:
         st.subheader("Normalization Params")
         timestamp_colname = st.text_input("Timestamp column name", value='lsl_unix_ts')

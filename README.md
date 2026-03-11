@@ -7,6 +7,8 @@ A collection of Python packages for reading EEG, Accelerometer, Gyroscope, and P
 
 ## Functions
 
+_Click each of the ">" items to get more information on their command lines._
+
 ### Recording Data: `record/`
 
 <details>
@@ -150,8 +152,9 @@ _**NOTE**: This script will REMOVE YOUR ORIGINAL TIMESTAMPS and replace it with 
 There are some options out there for you, sorted in descending recommendation:
 
 1. [**BlueMuse**](https://github.com/kowalej/BlueMuse): The _recommended_ way of outputting an LSL stream of Muse data.
-2. [Mind Monitor](https://mind-monitor.com/): An all-in-one package that also provides in-built recording functions, though timestamp accuracy is restricted.
 3. [Petal Metrics](https://petal.tech/downloads): A viable alternative that also provides in-built recording, though with many caveats such as recording pausing when an EEG channel is interrupted.
+    - Free versions of the software have been cached prior to the developers paywalling their application; you can find them [here](https://drive.google.com/drive/folders/1pxSlfkkcTht9MzreAyp8IR23FEXUREAD?usp=drive_link) (Windows and Linux only)
+2. [Mind Monitor](https://mind-monitor.com/): An all-in-one package that also provides in-built recording functions, though timestamp accuracy is restricted.
 
 Here are the basic rundowns of their functions:
 
@@ -215,7 +218,17 @@ You can double-check once more if the permission has been applied to "CurrentUse
 
 ### Step 3: Record
 
-This is a two-step process:
+#### Option 1: Streamlit Interface
+
+Once you've set up your virtual environment, you can instead use a web interface via Streamlit. To start the interface, simply run this command:
+
+```bash
+streamlit run app.py
+```
+
+#### Option 2: Command Lines
+
+Rather than Streamlit, you can still use basic command lines. This is a two-step process:
 
 1. Start streaming from whichever streaming application you've decided on.
 2. Start recording via `record.py`
