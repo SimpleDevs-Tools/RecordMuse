@@ -11,6 +11,19 @@ _Click each of the ">" items to get more information on their command lines._
 
 ### Recording Data: `record/`
 
+This covers anything related to recording data from LSL streams and handling raw data prior to **processing**.
+
+<details>
+<summary><strong>Debugging Preset Configs: <code>record/stream_info.py</code></strong></summary>
+
+```bash
+python record/stream_info.py
+```
+
+This script looks at a specific file, `record/stream_presets.yaml`, and cross-references it with the stream output of either _BlueMuse_ or _Petal Metrics_. It provides the initial experimentation and debug code to check if _RecordMuse_ can properly detect which preset, among several, to follow when recording or demo-ing LSL streams. Users can also modify this file or create their own `.yaml` file to generate a unique stream config.
+
+</details>
+
 <details>
 <summary><strong>Demo-ing: <code>record/demo.py</code></strong></summary>
 
@@ -42,6 +55,17 @@ _**NOTE**: It is NOT safe to call this script BEFORE you start your LSL stream. 
 </details>
 
 ### Processing Data: `processing/`
+
+<details>
+<summary><strong>Convert from Mind Monitor to BlueMuse: <code>processing/convert.py</code></strong></summary>
+
+```bash
+python processing/convert.py <path/to/muse/csv>
+```
+
+Mind Monitor may give you a single `.csv` file that contains all the raw EEG data, accelerometer data, gyroscope data, and ppg data. If you want to convert this into a format more befitting this toolkit's expected format (i.e. the BlueMuse data formats, where each stream its its own `.csv` file), then you can use this script.
+
+</details>
 
 <details>
 <summary><strong>Filtering: <code>processing/filter.py</code></strong></summary>
@@ -77,17 +101,6 @@ This script normalizes your EEG to a mean of 0 and standard deviation of 1 PER C
     1. _Mean and Standard Deviation_: Each channel in the normalized data should be normalized to a mean of 0 and a standard deviation of 1.
     2. _Distribution Shape_: The distributions of each channel are compared between their raw and normalized variants; distribution histograms should look the same.
     3. _Frequency Distribution Check_: We perform a simple welch PSD calculation on both the raw and normalized data; though their powers should be at a different scale, their shapes should remain the same.
-
-</details>
-
-<details>
-<summary><strong>Conver from Mind Monitor to BlueMuse: <code>processing/convert.py</code></strong></summary>
-
-```bash
-python processing/convert.py <path/to/muse/csv>
-```
-
-Mind Monitor may give you a single `.csv` file that contains all the raw EEG data, accelerometer data, gyroscope data, and ppg data. If you want to convert this into a format more befitting this toolkit's expected format (i.e. the BlueMuse data formats, where each stream its its own `.csv` file), then you can use this script.
 
 </details>
 
@@ -228,11 +241,12 @@ streamlit run app.py
 
 #### Option 2: Command Lines
 
-Rather than Streamlit, you can still use basic command lines. This is a two-step process:
+Rather than Streamlit, you can still use basic command lines. This is an example of what you may do:
 
-1. Start streaming from whichever streaming application you've decided on.
-2. Start recording via `record.py`
+0. Start streaming from whichever streaming application you've decided on.
+1. Modify `record/stream_presets.yaml` or create your own `.yaml` to configure your stream outputs; use `record/stream_info.py` to debug your configuration.
+2. Start recording via `record/record.py`
 3. Do whatever task or operation you want while recording
-4. After ceasing recording, run `filter.py` to perform a basic 60Hz notch filter, as well as 1-40Hz bandpass if you so choose.
+4. After ceasing recording, run `processing/filter.py` to perform a basic 60Hz notch filter, as well as 1-40Hz bandpass if you so choose.
 5. Perform whatever operations needed to slice the EEG, Accelerometer, Gyroscope, and PPG data time-wise (i.e. align your data prior).
-6. use `psd.py` to calculate the power spectral density (PSD) and time-series Bandpowers of your filtered, sliced EEG data.
+6. use `analysis/psd.py` to calculate the power spectral density (PSD) and time-series Bandpowers of your filtered, sliced EEG data.
