@@ -25,7 +25,15 @@ def histogram_sparkline(values, bins=40, range=None):
 
 # ============ MAIN ============
 
-def normalize(rest_src:str, exp_src:str, ts_col:str='lsl_unix_ts', start_buffer=5.0, end_buffer=5.0, validate:bool=False):
+def normalize(
+    rest_src:str, 
+    exp_src:str, 
+    ts_col:str='lsl_unix_ts', 
+    start_buffer=5.0, 
+    end_buffer=5.0, 
+    outdir:str = None,
+    validate:bool=False
+):
 
     # Load data
     rest_df = pd.read_csv(rest_src)
@@ -66,8 +74,9 @@ def normalize(rest_src:str, exp_src:str, ts_col:str='lsl_unix_ts', start_buffer=
     ) / baseline_std
 
     # Save result
+    if outdir is None: outdir = os.path.dirname(exp_src)
     out_filename = ''.join(os.path.basename(exp_src).split('.')[:-1]) + '_normalized.csv'
-    outpath = os.path.join(os.path.dirname(exp_src), out_filename)
+    outpath = os.path.join(outdir, out_filename)
     exp_norm.to_csv(outpath, index=False)
 
     print("Normalization complete.")
@@ -106,6 +115,11 @@ def normalize(rest_src:str, exp_src:str, ts_col:str='lsl_unix_ts', start_buffer=
     plt.semilogy(f, p_exp, label="Experiment (norm)")
     plt.legend()
     plt.title(f"PSD: AF7")
+
+    # generate `plots` if doesn't exist
+    plot_outdir = os.path.join(outdir, 'plots')
+    os.makedirs(plot_outdir, exist_ok=True)
+    plt.savefig(os.path.join(plot_outdir, 'normalize_validation.png'), bbox_inches="tight", dpi=300)
     plt.show()
 
     # Return outpath
@@ -119,7 +133,16 @@ if __name__ == "__main__":
     parser.add_argument('-tc', '--ts_col', help="The timestamp column", type=str, default='lsl_unix_ts')
     parser.add_argument('-sb', '--start_buffer', help='The time buffer to cull out from the beginning of the rest-state EEG', type=float, default=5.0)
     parser.add_argument('-eb', '--end_buffer', help='The time buffer to cull out from the end of the rest-state EEG', type=float, default=5.0)
+    parser.add_argument('-od', '--outdir', help="The output directory where to save the normalized EEG data. Can be left blank.", type=str, default=None)
     parser.add_argument('-v', '--validate', help="Should we validate if the normalization is correct?", action='store_true')
     args = parser.parse_args()
-    normalize(args.rest_src, args.eeg_src, ts_col=args.ts_col, start_buffer=args.start_buffer, end_buffer=args.end_buffer, validate=args.validate)
+    normalize(
+        args.rest_src, 
+        args.eeg_src, 
+        ts_col=args.ts_col, 
+        start_buffer=args.start_buffer, 
+        end_buffer=args.end_buffer, 
+        outdir=args.outdir,
+        validate=args.validate
+    )
 

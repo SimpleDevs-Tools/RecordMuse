@@ -32,7 +32,12 @@ def interpolate_nans(x):
 
 # ===================== MAIN =====================
 
-def filter_eeg(eeg_csv_path, apply_bandpass:bool=False, verbose:bool=True):
+def filter_eeg(
+    eeg_csv_path, 
+    apply_bandpass:bool=False, 
+    outpath:str = None,
+    verbose:bool=True
+):
 
     # ===================== READING =====================
     
@@ -93,15 +98,20 @@ def filter_eeg(eeg_csv_path, apply_bandpass:bool=False, verbose:bool=True):
         filtered[:, ch] = x
 
     # Save filtered file
-    out_path = eeg_csv_path.with_name(
-        eeg_csv_path.stem + "_filtered.csv"
-    )
-
+    if outpath is not None and len(outpath)>0:
+        outpath = Path(outpath)
+        if outpath.is_dir():
+            outpath = outpath / f"{eeg_csv_path.stem}_filtered.csv"
+    else:
+        outpath = eeg_csv_path.with_name(
+            eeg_csv_path.stem + "_filtered.csv"
+        )
+    outpath.parent.mkdir(parents=True, exist_ok=True)
     df_filtered = df.copy()
     df_filtered[EEG_CHANNELS] = filtered
-    df_filtered.to_csv(out_path, index=False)
+    df_filtered.to_csv(outpath, index=False)
 
-    if verbose: print(f"Filtered EEG saved to: {out_path}")
+    if verbose: print(f"Filtered EEG saved to: {outpath}")
 
     # ===================== OPTIONAL QC PLOT =====================
 
@@ -118,11 +128,16 @@ def filter_eeg(eeg_csv_path, apply_bandpass:bool=False, verbose:bool=True):
     plt.title("EEG Power Spectral Density (TP9)")
     plt.legend()
     plt.tight_layout()
-    plt.savefig(eeg_csv_path.with_name(eeg_csv_path.stem + "_filtered.png"), bbox_inches='tight')
+
+    # Save figure
+    plot_outdir = outpath.parent / "plots"
+    plot_outdir.mkdir(parents=True, exist_ok=True)
+    plot_outpath = plot_outdir / f"{outpath.stem}.png"
+    plt.savefig(plot_outpath, bbox_inches='tight', dpi=300)
     plt.show()
 
     # Return the outpath
-    return out_path
+    return outpath
 
 
 # ===================== ENTRY POINT =====================
@@ -132,6 +147,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Filters 60Hz notch with a provided EEG file outputted from `record.py`.")
     parser.add_argument('filepath', help="Provide the relative filepath to your raw EEG file.", type=str)
     parser.add_argument('-b', '--apply_bandpass', help="Should we apply bandpass filtering?", action="store_true")
+    parser.add_argument('-op', '--outpath', help="Providing the path to where the filtered EEG ought to be saved. Can be either a filepath (with extension) or just a directory.", type=str, default=None)
     parser.add_argument('-v', '--verbose', help="Print statements to track how the operation is going?", action="store_true")
     args = parser.parse_args()
-    filter_eeg(args.filepath, apply_bandpass=args.apply_bandpass, verbose=args.verbose)
+    filter_eeg(
+        args.filepath, 
+        apply_bandpass=args.apply_bandpass, 
+        outpath=args.outpath,
+        verbose=args.verbose
+    )

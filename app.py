@@ -488,6 +488,7 @@ if len(st.session_state.selected) > 0:
     with col1:
         st.subheader("Filtering Params")
         st.markdown("This operation generates a new `EEG_filtered.csv` for each of the rest and simulation eeg files.")
+        #filter_outpath = st.text_input()
         apply_bandpass = st.checkbox("Apply bandpass filtering to smooth EEG signals", value=True)
     with col2:
         st.subheader("Normalization Params")
