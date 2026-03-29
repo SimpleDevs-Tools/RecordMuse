@@ -4,6 +4,7 @@
 
 # Samples
 samples/
+samples_debug/
 **/_recording_*
 
 # Mac-specific
