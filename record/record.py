@@ -14,24 +14,17 @@ from pylsl import StreamInlet, resolve_byprop
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtWidgets
 
+import stream_info
+
 
 # ===================== CONFIG =====================
 
-STREAM_TYPES = ['EEG', 'Accelerometer', 'Gyroscope', 'PPG']
-
-STREAM_CHANNELS = {
-    'EEG': ['TP9', 'AF7', 'AF8', 'TP10', 'Right AUX'],
-    'Accelerometer': ['X', 'Y', 'Z'],
-    'Gyroscope': ['X', 'Y', 'Z'],
-    'PPG': ['PPG1', 'PPG2', 'PPG3']
-}
-
-STREAM_RATES = {
-    'EEG': 256,
-    'Accelerometer': 50,
-    'Gyroscope': 50,
-    'PPG': 64
-}
+_STREAM_PRESETS = "record/stream_presets.yaml"
+_STREAM_PRESET, _STREAMS, _ = stream_info.get_best_stream_preset(presets_src=_STREAM_PRESETS)
+print("Optimal stream preset:", _STREAM_PRESET)
+_STREAM_TYPES = [s['type'] for s in _STREAMS]
+_STREAM_CHANNELS = {s['type']:s['channels'] for s in _STREAMS}
+_STREAM_RATES = {s['type']:s['sample_rate'] for s in _STREAMS}
 
 VIS_WINDOW_SEC = 5
 PLOT_FPS = 20
@@ -56,14 +49,14 @@ while os.path.exists(outdir):
     outdir = f"{base_outdir}_{count}"
 os.makedirs(outdir, exist_ok=True)
 
-queues = {stype: Queue() for stype in STREAM_TYPES}
+queues = {stype: Queue() for stype in _STREAM_TYPES}
 
 viz_buffers = {}
 viz_locks = {}
 
 if args.visualize:
-    for stype in STREAM_TYPES:
-        maxlen = VIS_WINDOW_SEC * STREAM_RATES[stype]
+    for stype in _STREAM_TYPES:
+        maxlen = VIS_WINDOW_SEC * _STREAM_RATES[stype]
         viz_buffers[stype] = deque(maxlen=maxlen)
         viz_locks[stype] = Lock()
 
@@ -104,7 +97,7 @@ def consumer_thread(stream_type):
 
     with open(filepath, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['unix_ms', 'lsl_unix_ts', *STREAM_CHANNELS[stream_type]])
+        writer.writerow(['unix_ms', 'lsl_unix_ts', *_STREAM_CHANNELS[stream_type]])
 
         while not stop_event.is_set() or not queues[stream_type].empty():
             try:
@@ -121,7 +114,7 @@ class StreamWindow(QtWidgets.QWidget):
     def __init__(self, stream_type):
         super().__init__()
         self.stream_type = stream_type
-        self.channels = STREAM_CHANNELS[stream_type]
+        self.channels = _STREAM_CHANNELS[stream_type]
         self.n_ch = len(self.channels)
 
         self.setWindowTitle(stream_type)
@@ -163,7 +156,7 @@ class EEGWindow(QtWidgets.QWidget):
         super().__init__()
 
         self.stream_type = 'EEG'
-        self.channels = STREAM_CHANNELS['EEG']
+        self.channels = _STREAM_CHANNELS['EEG']
         self.n_ch = len(self.channels)
 
         self.setWindowTitle("EEG")
@@ -230,7 +223,7 @@ def record():
     threads = []
 
     # Start recording threads
-    for stype in STREAM_TYPES:
+    for stype in _STREAM_TYPES:
         p = Thread(target=producer_thread, args=(stype,), daemon=True)
         c = Thread(target=consumer_thread, args=(stype,), daemon=True)
         p.start()
@@ -281,7 +274,7 @@ def record():
         windows.append(EEGWindow())
         windows[-1].show()
 
-        for stype in ['Accelerometer', 'Gyroscope', 'PPG']:
+        for stype in [s for s in _STREAM_TYPES if s.lower() != 'eeg']:
             w = StreamWindow(stype)
             w.show()
             windows.append(w)

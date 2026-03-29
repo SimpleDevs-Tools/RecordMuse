@@ -88,6 +88,122 @@ with st.expander("Prerequisite Software"):
         st.markdown("Mind Monitor (Windows, OS X, iOS, Android)", width="stretch", text_alignment="center")
         st.link_button("Official Download", "https://mind-monitor.com/", width="stretch")
 
+with st.expander("Data Formatting and Features: _BlueMuse_"):
+    st.markdown("_BlueMuse_ does not have any file-saving functionality. You must use a separate application (e.g. _RecordMuse_) to record data.")
+    st.markdown("There are **4** separate streams that _BlueMuse_ outputs and _RecordMuse_ records:")
+    with st.expander("`Accelerometer.csv`"):
+        """
+        - unix_ms
+        - lsl_unix_ts
+        - X
+        - Y
+        - Z
+        """
+    with st.expander("`EEG.csv`"):
+        """
+        - unix_ms
+        - lsl_unix_ts
+        - TP9
+        - AF7
+        - AF8
+        - TP10
+        - Right AUX
+        """
+    with st.expander("`Gyroscope.csv`"):
+        """
+        - unix_ms
+        - lsl_unix_ts
+        - X
+        - Y
+        - Z
+        """
+    with st.expander("`PPG.csv`"):
+        """
+        - unix_ms
+        - lsl_unix_ts
+        - PPG1
+        - PPG2
+        - PPG3
+        """
+with st.expander("Data Formatting and Features: _Petal Metrics_"):
+    st.markdown("Data logs are saved locally and are the recommended way to access data. If needed, you can use _RecordMuse_ to record the LSL streams outputted by _Petal Metrics_; however, some data logs may not be properly recorded.")
+    with st.expander("`accelerometer.csv`"):
+        """
+        - id
+        - lsl_ts
+        - unix_ts
+        - x
+        - y
+        - z
+        """
+    with st.expander("`eeg.csv`"):
+        """
+        - id
+        - lsl_ts
+        - unix_ts
+        - ch1
+        - ch2
+        - ch3
+        - ch4
+        - ch5
+        """
+    with st.expander("`gyroscope.csv`"):
+        """
+        - id
+        - lsl_ts
+        - unix_ts
+        - x
+        - y
+        - z
+        """
+    with st.expander("`ppg.csv`"):
+        """
+        - id
+        - lsl_ts
+        - unix_ts
+        - ambient
+        - ir
+        - red
+        """
+    with st.expander("`telemetry.csv`"):
+        """
+        - id
+        - lsl_ts
+        - unix_ts
+        - battery_level
+        - temperature_c
+        - fuel_gauge_voltage
+        """
+    with st.expander("`connection_status.csv`"):
+        """
+        - id
+        - lsl_ts
+        - unix_ts
+        - status
+        """
+with st.expander("Data Formatting and Features: _Mind Monitor_"): 
+    st.markdown("_Mind Monitor_ is a mobile app that is **INCOMPATIBLE** with _RecordMuse_. Instead, _Mind Monitor_ has the ability to save data logs by itself.")
+    st.markdown("The Android version of _Mind Monitor_ gives you flexibility with where the outputted `.csv` file is saved. On iOS and iPad OS, you MUST connect a Dropbox account; all data logs are saved via the cloud, meaning your mobile device requires an internet connection.")
+    st.error("**Warning**: We do NOT recommend _Mind Monitor_ as a data collection scheme. This is because the application will condense all data streams into a singular file. This in turn causes duplicates and other anomalies as the software attempts to merge timestamps and events. Furthermore, we expect that some time lag is present due to the application also performing bandpower calculations.")
+    with st.expander("`mindMonitor_<datetime>.csv`"):
+        """
+        - TimeStamp
+        - Delta_TP9, Delta_AF7, Delta_AF8, Delta_TP10
+        - Theta_TP9, Theta_AF7, Theta_AF8, Theta_TP10
+        - Alpha_TP9, Alpha_AF7, Alpha_AF8, Alpha_TP10
+        - Beta_TP9, Beta_AF7, Beta_AF8, Beta_TP10
+        - Gamma_TP9, Gamma_AF7, Gamma_AF8, Gamma_TP10
+        - RAW_TP9, RAW_AF7, RAW_AF8, RAW_TP10
+        - AUX_RIGHT, AUX_LEFT
+        - Accelerometer_X, Accelerometer_Y, Accelerometer_Z
+        - Gyro_X, Gyro_Y, Gyro_Z
+        - PPG_Ambient, PPG_IR, PPG_Red, Heart_Rate
+        - HeadBandOn, 
+        - HSI_TP9, HSI_AF7, HSI_AF8, HSI_TP10,
+        - Battery
+        - Elements
+        """
+
 
 # ================================
 # State Initialization
@@ -103,6 +219,26 @@ if "proc" not in st.session_state:      st.session_state.proc = None
 def is_running():
     p = st.session_state.proc
     return p is not None and p.poll() is None
+
+"""
+---
+
+## Before You Begin: Modifying Preset Configurations
+
+_RecordMuse_ requires a specific configuration file: `record/stream_presets.yaml`. This is a special file that contains the stream configurations for how 
+_RecordMuse_ should record data from either _BlueMuse_ or _Petal Metrics_ (remember: _Mind Monitor_ does not actually interface with _RecordMuse_). 
+
+Both `record/demo.py` and `record/record.py` rely on this `.yaml` file, and you can either 1) Modify this file to your liking, or 2) create your own 
+configuration `.yaml` file. If you decide to create your own config file, then you must **modify `demo.py` and `record.py` to point to the new config file!** 
+
+To debug whether the final config file is being properly read and cross-referenced with your LSL streaming software, then follow these steps:
+
+1. Activate either your _BlueMuse_ or _Petal Metrics_ stream.
+2. Run `record/stream_info.py`. You can modify it to point to your intended `.yaml` file.
+3. In the Terminal window, check if there are any errors.
+
+If your config file is being properly used, you should see details in the terminal window. If not, an error message may pop up.
+"""
 
 
 # ================================
@@ -428,6 +564,8 @@ st.markdown(
 # --------------------------
 with st.expander("### Demo, Record, or Convert EEG"):
     st.code(
+        "# Debug Stream, Identify Optimal Preset Config:\n" + \
+        "python ./record/stream_info.py\n" + \
         "# Demo:\n" + \
         "python ./record/demo.py\n" + \
         "# Record EEG via BlueMuse:\n" + \

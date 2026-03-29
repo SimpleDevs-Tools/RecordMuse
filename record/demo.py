@@ -4,29 +4,22 @@ from threading import Thread, Event, Lock
 from collections import deque
 
 import numpy as np
-from pylsl import StreamInlet, resolve_byprop
+from pylsl import StreamInlet, resolve_byprop, resolve_streams
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtWidgets
 
+import stream_info
+
 
 # ===================== CONFIG =====================
 
-STREAM_TYPES = ['EEG', 'Accelerometer', 'Gyroscope', 'PPG']
-
-STREAM_CHANNELS = {
-    'EEG': ['TP9', 'AF7', 'AF8', 'TP10', 'Right AUX'],
-    'Accelerometer': ['X', 'Y', 'Z'],
-    'Gyroscope': ['X', 'Y', 'Z'],
-    'PPG': ['PPG1', 'PPG2', 'PPG3']
-}
-
-STREAM_RATES = {
-    'EEG': 256,
-    'Accelerometer': 50,
-    'Gyroscope': 50,
-    'PPG': 64
-}
+_STREAM_PRESETS = "record/stream_presets.yaml"
+_STREAM_PRESET, _STREAMS, _ = stream_info.get_best_stream_preset(presets_src=_STREAM_PRESETS)
+print("Optimal stream preset:", _STREAM_PRESET)
+_STREAM_TYPES = [s['type'] for s in _STREAMS]
+_STREAM_CHANNELS = {s['type']:s['channels'] for s in _STREAMS}
+_STREAM_RATES = {s['type']:s['sample_rate'] for s in _STREAMS}
 
 VIS_WINDOW_SEC = 5
 PLOT_FPS = 20
@@ -39,8 +32,8 @@ stop_event = Event()
 viz_buffers = {}
 viz_locks = {}
 
-for stype in STREAM_TYPES:
-    maxlen = VIS_WINDOW_SEC * STREAM_RATES[stype]
+for stype in _STREAM_TYPES:
+    maxlen = VIS_WINDOW_SEC * _STREAM_RATES[stype]
     viz_buffers[stype] = deque(maxlen=maxlen)
     viz_locks[stype] = Lock()
 
@@ -73,7 +66,7 @@ class StreamWindow(QtWidgets.QWidget):
     def __init__(self, stream_type):
         super().__init__()
         self.stream_type = stream_type
-        self.channels = STREAM_CHANNELS[stream_type]
+        self.channels = _STREAM_CHANNELS[stream_type]
         self.n_ch = len(self.channels)
 
         self.setWindowTitle(stream_type)
@@ -114,7 +107,7 @@ class EEGWindow(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
-        self.channels = STREAM_CHANNELS['EEG']
+        self.channels = _STREAM_CHANNELS['EEG']
         self.n_ch = len(self.channels)
 
         self.setWindowTitle("EEG")
@@ -169,7 +162,18 @@ def handle_sigint(sig, frame):
 def demo():
     threads = []
 
-    for stype in STREAM_TYPES:
+    streams = resolve_streams()
+    # Extract and print the names of all discovered streams
+    for i, stream in enumerate(streams):
+        print(f"Stream `{i+1}`:")
+        print(f"  Name: {stream.name()}")
+        print(f"  Type: {stream.type()}")
+        print(f"  Channels: {stream.channel_count()}")
+        print(f"  Sampling Rate: {stream.nominal_srate()}")
+        print(f"  Source ID: {stream.source_id()}")
+        print()
+
+    for stype in _STREAM_TYPES:
         t = Thread(target=producer_thread, args=(stype,), daemon=True)
         t.start()
         threads.append(t)
@@ -188,7 +192,7 @@ def demo():
     windows.append(EEGWindow())
     windows[-1].show()
 
-    for stype in ['Accelerometer', 'Gyroscope', 'PPG']:
+    for stype in [s for s in _STREAM_TYPES if s.lower() != 'eeg']:
         w = StreamWindow(stype)
         w.show()
         windows.append(w)

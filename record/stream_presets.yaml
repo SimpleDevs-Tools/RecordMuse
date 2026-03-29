@@ -1,0 +1,74 @@
+bluemuse:
+  - name: "EEG"
+    type: "EEG"
+    sample_rate: 256
+    channels:
+      - "TP9"
+      - "AF7"
+      - "AF8"
+      - "TP10"
+      - "Right AUX"
+  - name: "Accelerometer"
+    type: "Accelerometer"
+    sample_rate: 52
+    channels:
+      - "X"
+      - "Y"
+      - "Z"
+  - name: "Gyroscope"
+    type: "Gyroscope"
+    sample_rate: 52
+    channels:
+      - "X"
+      - "Y"
+      - "Z"
+  - name: "PPG"
+    type: "PPG"
+    sample_rate: 64
+    channels:
+      - "Ambient"
+      - "Infrared"
+      - "Red"
+petal_metrics:
+  - name: "EEG"
+    type: "EEG"
+    sample_rate: 256
+    channels:
+      - "TP9"
+      - "AF7"
+      - "AF8"
+      - "TP10"
+      - "AUX"
+  - name: "Accelerometer"
+    type: "ACCEL"
+    sample_rate: 54
+    channels:
+      - "X"
+      - "Y"
+      - "Z"
+  - name: "Gyroscope"
+    type: "GYRO"
+    sample_rate: 54
+    channels:
+      - "X"
+      - "Y"
+      - "Z"
+  - name: "PPG"
+    type: "PPG"
+    sample_rate: 64
+    channels:
+      - "Ambient"
+      - "Infrared"
+      - "Red"
+  - name: "Telemetry"
+    type: "TELE"
+    sample_rate: 1
+    channels:
+      - "Battery Level"
+      - "Temperature"
+      - "Fuel Gauge Voltage"
+  - name: "Connection_Status"
+    type: "BinaryConnectionStatus"
+    sample_rate: 1
+    channels:
+      - "Status"

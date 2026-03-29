@@ -4,6 +4,7 @@
 
 # Samples
 samples/
+**/_recording_*
 
 # Mac-specific
 **/*.DS_Store
