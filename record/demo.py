@@ -1,3 +1,4 @@
+import argparse
 import time
 import signal
 from threading import Thread, Event, Lock
@@ -12,10 +13,16 @@ from pyqtgraph.Qt import QtCore, QtWidgets
 import stream_info
 
 
+
+# ===================== ARGUMENT HANDLING ==========
+
+parser = argparse.ArgumentParser(description="Demo data collection from an LSL streaming software like _BlueMuse_ or _Petal Metrics_.")
+parser.add_argument('-c', '--config', help="Path to a preset configuration `.yaml` file that is used to identify which streams to record. Default='record/stream_presets.yaml'.", type=str, default="record/stream_presets.yaml")
+args = parser.parse_args()
+
 # ===================== CONFIG =====================
 
-_STREAM_PRESETS = "record/stream_presets.yaml"
-_STREAM_PRESET, _STREAMS, _ = stream_info.get_best_stream_preset(presets_src=_STREAM_PRESETS)
+_STREAM_PRESET, _STREAMS, _ = stream_info.get_best_stream_preset(presets_src=args.config)
 print("Optimal stream preset:", _STREAM_PRESET)
 _STREAM_TYPES = [s['type'] for s in _STREAMS]
 _STREAM_CHANNELS = {s['type']:s['channels'] for s in _STREAMS}

@@ -16,11 +16,18 @@ from pyqtgraph.Qt import QtCore, QtWidgets
 
 import stream_info
 
+# ===================== ARGUMENTS =====================
+
+parser = argparse.ArgumentParser(description="Record LSL streams of Muse devices. You can provide an output directory if needed.")
+parser.add_argument('-c', '--config', help="Path to a preset configuration `.yaml` file that is used to identify which streams to record. Default='record/stream_presets.yaml'.", type=str, default="record/stream_presets.yaml")
+parser.add_argument('-d', '--dir', help='Provide an output directory where all files are to be saved.', type=str, default=None)
+parser.add_argument('-rd', '--record_duration', help="If toggled, you can define for how long the recording runs for, in seconds.", type=float)
+parser.add_argument('-v', '--visualize', help="Enable live visualization (PyQtGraph windows). Disabling visualizations may help with improving performance.", action="store_true")
+args = parser.parse_args()
 
 # ===================== CONFIG =====================
 
-_STREAM_PRESETS = "record/stream_presets.yaml"
-_STREAM_PRESET, _STREAMS, _ = stream_info.get_best_stream_preset(presets_src=_STREAM_PRESETS)
+_STREAM_PRESET, _STREAMS, _ = stream_info.get_best_stream_preset(presets_src=args.config)
 print("Optimal stream preset:", _STREAM_PRESET)
 _STREAM_TYPES = [s['type'] for s in _STREAMS]
 _STREAM_CHANNELS = {s['type']:s['channels'] for s in _STREAMS}
@@ -28,14 +35,6 @@ _STREAM_RATES = {s['type']:s['sample_rate'] for s in _STREAMS}
 
 VIS_WINDOW_SEC = 5
 PLOT_FPS = 20
-
-# ===================== ARGUMENTS =====================
-
-parser = argparse.ArgumentParser(description="Record LSL streams of Muse devices. You can provide an output directory if needed.")
-parser.add_argument('-d', '--dir', help='[OPTIONAL] Provide an output directory where all files are to be saved.', type=str, default=None)
-parser.add_argument('-rd', '--record_duration', help="If toggled, you can define for how long the recording runs for, in seconds.", type=float)
-parser.add_argument('-v', '--visualize', help="Enable live visualization (PyQtGraph windows). Disabling visualizations may help with improving performance.", action="store_true")
-args = parser.parse_args()
 
 # ===================== GLOBALS =====================
 

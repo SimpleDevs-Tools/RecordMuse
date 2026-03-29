@@ -1,6 +1,7 @@
 from pylsl import resolve_streams
 import yaml
 import pprint
+import argparse
 
 # ============================
 # Normalization Between Configurations
@@ -40,6 +41,9 @@ def get_streams(verbose:bool = True):
     streams = resolve_streams(wait_time=3)
     # Extract and print the names of all discovered streams
     stream_details = []
+    if verbose:
+        print("")
+        print("=== DETECTED STREAM DETAILS ===")
     for i, stream in enumerate(streams):
         if verbose:
             print(f"Stream `{i+1}`:")
@@ -49,7 +53,6 @@ def get_streams(verbose:bool = True):
             print(f"  Sampling Rate: {stream.nominal_srate()}")
             print(f"  Source ID: {stream.source_id()}")
             print(f"  Host: {stream.hostname()}")
-            print()
         stream_details.append({
             "name": stream.name(),
             "type": stream.type(),
@@ -148,6 +151,18 @@ def get_best_stream_preset(presets_src:str="record/stream_presets.yaml"):
     return best[0], results[best[0]]['matched'], results
 
 if __name__ == "__main__":
-    best_preset, best_streams, _ = get_best_stream_preset()
-    print("Estimated Stream Preset:", best_preset)
+    # Handle command line arguments
+    parser = argparse.ArgumentParser(description="Check what data streams an active LSL software is outputting, and contrast that with known presets.")
+    parser.add_argument("-c", "--config_filepath", help="Path to the query `.yaml` configuration file. Default=`record/stream_presets.yaml`.", type=str, default='./record/stream_presets.yaml')
+    args = parser.parse_args()
+
+    # Get the best preset and best stream config
+    best_preset, best_streams, _ = get_best_stream_preset(presets_src=args.config_filepath)
+
+    # Print results    
+    print("")
+    print("=== Estimated Stream Preset ===")
+    print("- Best Preset:", best_preset)
+    print("- Best Preset Config:")
     pprint.pprint(best_streams, indent=2)
+    print("")
