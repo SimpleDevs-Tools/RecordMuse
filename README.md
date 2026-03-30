@@ -1,5 +1,7 @@
 # Record Muse
 
+[![DOI](https://zenodo.org/badge/1128364232.svg)](https://doi.org/10.5281/zenodo.19324248)
+
 A collection of Python packages for reading EEG, Accelerometer, Gyroscope, and PPG data from a Muse S or Muse 2 devices by InteraXon Inc. This tool allows you to:
 
 1. Recording LSL streams emitted by applications such as [BlueMuse](https://github.com/kowalej/BlueMuse), [Petal Metrics](https://petal.tech/downloads), and [Mind Monitor](https://mind-monitor.com/).
@@ -12,7 +14,21 @@ For basic usage, please refer to the following pages:
 
 ## Usage Permissions
 
-This project is licensed under the terms of the MIT license.
+If you end up using this repository, please **cite this repository's contribution**:
+
+```
+@misc{https://doi.org/10.5281/zenodo.19324248,
+  doi = {10.5281/ZENODO.19324248},
+  url = {https://zenodo.org/doi/10.5281/zenodo.19324248},
+  author = {Kim,  Ryan},
+  title = {RecordMuse: Easy Interface for Recording and Analyzing Interaxon Muse EEG Devices},
+  publisher = {Zenodo},
+  year = {2026},
+  copyright = {MIT License}
+}
+```
+
+Othjerwise, this project is licensed under the terms of the MIT license.
 
 > Copyright (c) 2026 Ryan Kim
 >
