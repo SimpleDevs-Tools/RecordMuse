@@ -32,6 +32,7 @@ def normalize(
     start_buffer=5.0, 
     end_buffer=5.0, 
     outdir:str = None,
+    plot_outdir:str = None,
     validate:bool=False
 ):
 
@@ -117,7 +118,8 @@ def normalize(
     plt.title(f"PSD: AF7")
 
     # generate `plots` if doesn't exist
-    plot_outdir = os.path.join(outdir, 'plots')
+    if plot_outdir is None:
+        plot_outdir = os.path.join(outdir, 'plots')
     os.makedirs(plot_outdir, exist_ok=True)
     plt.savefig(os.path.join(plot_outdir, 'normalize_validation.png'), bbox_inches="tight", dpi=300)
     plt.show()

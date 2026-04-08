@@ -262,23 +262,27 @@ def plot_time_series(
 
 # ========== MAIN FUNCTION ==========
 
-def calculate_psd(src):
+def calculate_psd(
+    src:str,
+    plot_outdir:str = None
+):
     # Read the pandas dataframe
     df = pd.read_csv(src)
 
     # Generate output directory, which save everything to a `plots` directory in the same directory as the provided file
     csv_output_dir = os.path.dirname(src)
-    plot_output_dir = os.path.join(csv_output_dir,'plots')
-    os.makedirs(plot_output_dir, exist_ok=True)
+    if plot_outdir is None:
+        plot_outdir = os.path.join(csv_output_dir,'plots')
+    os.makedirs(plot_outdir, exist_ok=True)
 
     # Compute and plot freqs, times, and psd
     freqs, times, psd = compute_muse_psd(df)
-    psd_outpath = os.path.join(plot_output_dir,'psd.png')
+    psd_outpath = os.path.join(plot_outdir,'psd.png')
     plot_muse_psd([{'freqs':freqs, 'times':times, 'psd':psd}], savename=psd_outpath)
 
     # Compute and plot time series
     bandpowers = compute_bandpowers_time_series(freqs, times, psd)
-    bandpowers_outpath = os.path.join(plot_output_dir,'bandpowers.png')
+    bandpowers_outpath = os.path.join(plot_outdir,'bandpowers.png')
     plot_time_series(
         bandpowers, 
         x_col='lsl_unix_ts', 
@@ -302,5 +306,6 @@ def calculate_psd(src):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Produces PSD plots, based on EEG data. Recommend to filter first using `filter.py`.")
     parser.add_argument('src', help="Provide the relative filepath to your raw EEG file.", type=str)
+    parser.add_argument('-pod', '--plot_outdir', help="Define the output directory of all plots, if needed (default = None)", type=str, default=None)
     args = parser.parse_args()
     calculate_psd(args.src)

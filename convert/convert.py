@@ -2,7 +2,19 @@ import os
 import pandas as pd
 from collections import defaultdict
 import argparse
-from check_config import load_presets, normalize, match_single_csv
+import datetime
+from .check_config import load_presets, normalize, match_single_csv
+
+def timestamp_to_unix_milliseconds(x) -> int:      # Helper: converts timestamps to unix
+    date_format = datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S.%f")
+    unix_seconds = datetime.datetime.timestamp(date_format)
+    unix_milliseconds = int(unix_seconds * 1000)
+    return unix_milliseconds
+
+def timestamp_to_unix_seconds(x) -> int:      # Helper: converts timestamps to unix
+    date_format = datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S.%f")
+    unix_seconds = datetime.datetime.timestamp(date_format)
+    return unix_seconds
 
 def split_mind_monitor(
     df:pd.DataFrame
@@ -19,8 +31,11 @@ def split_mind_monitor(
         present = [c for c in cols if c in df.columns]
         return len(present) / len(cols) >= threshold
 
+    df['unix_ms'] = df['TimeStamp'].apply(timestamp_to_unix_milliseconds)
+    df['lsl_unix_ts'] = df['TimeStamp'].apply(timestamp_to_unix_seconds)
+
     # EEG (RAW)
-    eeg_cols = ["TimeStamp", "RAW_TP9", "RAW_AF7", "RAW_AF8", "RAW_TP10", "AUX_RIGHT"]
+    eeg_cols = ["TimeStamp", "unix_ms", "lsl_unix_ts", "RAW_TP9", "RAW_AF7", "RAW_AF8", "RAW_TP10", "AUX_RIGHT"]
     if has_cols(eeg_cols):
         streams["EEG"] = df[eeg_cols].rename(columns={
             "RAW_TP9": "TP9",
@@ -29,9 +44,10 @@ def split_mind_monitor(
             "RAW_TP10": "TP10",
             "AUX_RIGHT": "Right AUX"
         })
+        
 
     # Accelerometer
-    accel_cols = ["TimeStamp", "Accelerometer_X", "Accelerometer_Y", "Accelerometer_Z"]
+    accel_cols = ["TimeStamp", "unix_ms", "lsl_unix_ts", "Accelerometer_X", "Accelerometer_Y", "Accelerometer_Z"]
     if has_cols(accel_cols):
         streams["Accelerometer"] = df[accel_cols].rename(columns={
             "Accelerometer_X": "X",
@@ -40,7 +56,7 @@ def split_mind_monitor(
         })
 
     # Gyroscope
-    gyro_cols = ["TimeStamp", "Gyro_X", "Gyro_Y", "Gyro_Z"]
+    gyro_cols = ["TimeStamp", "unix_ms", "lsl_unix_ts", "Gyro_X", "Gyro_Y", "Gyro_Z"]
     if has_cols(gyro_cols):
         streams["Gyroscope"] = df[gyro_cols].rename(columns={
             "Gyro_X": "X",
@@ -49,7 +65,7 @@ def split_mind_monitor(
         })
 
     # PPG
-    ppg_cols = ["TimeStamp", "PPG_Ambient", "PPG_IR", "PPG_Red"]
+    ppg_cols = ["TimeStamp", "unix_ms", "lsl_unix_ts", "PPG_Ambient", "PPG_IR", "PPG_Red"]
     if has_cols(ppg_cols):
         streams["PPG"] = df[ppg_cols].rename(columns={
             "PPG_Ambient": "Ambient",
@@ -86,6 +102,10 @@ def convert_dataframe(
 
     if "timestamp" in norm_cols:
         new_df["TimeStamp"] = df[norm_cols["timestamp"]]
+    if "unixms" in norm_cols:
+        new_df["unix_ms"] = df[norm_cols["unixms"]]
+    if "lslunixts" in norm_cols:
+        new_df["lsl_unix_ts"] = df[norm_cols["lslunixts"]]
 
     for ch in target_stream["channels"]:
         key = normalize(ch)
@@ -111,6 +131,8 @@ def convert_file(
 
     # Get the configuration name
     source_config = match["config"]
+    #print("Detected config:", source_config)
+    #print("Convert to:", target_config)
 
     # Prepare outputs
     outputs = []

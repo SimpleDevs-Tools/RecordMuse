@@ -36,6 +36,7 @@ def filter_eeg(
     eeg_csv_path, 
     apply_bandpass:bool=False, 
     outpath:str = None,
+    plot_outdir:str = None,
     verbose:bool=True
 ):
 
@@ -130,7 +131,8 @@ def filter_eeg(
     plt.tight_layout()
 
     # Save figure
-    plot_outdir = outpath.parent / "plots"
+    if plot_outdir is not None: plot_outdir = Path(plot_outdir)
+    else:                       plot_outdir = outpath.parent / "plots"
     plot_outdir.mkdir(parents=True, exist_ok=True)
     plot_outpath = plot_outdir / f"{outpath.stem}.png"
     plt.savefig(plot_outpath, bbox_inches='tight', dpi=300)
